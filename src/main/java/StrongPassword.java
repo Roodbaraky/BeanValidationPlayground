@@ -18,8 +18,8 @@ import jakarta.validation.constraints.Size;
 
 @ReportAsSingleViolation
 @NotNull
-@NotBlank
-@Size(min = 6, max = 16)
+@NotBlank(message = "Password cannot be blank.")
+@Size(min = 6, max = 16,  message = "Password must be between 6 and 16 characters.")
 @Constraint(validatedBy = {StrongPasswordValidator.class})
 @Target({ElementType.TYPE_USE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

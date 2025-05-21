@@ -1,8 +1,6 @@
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.List;
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -12,6 +10,8 @@ import jakarta.validation.ValidatorFactory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class UserTest {
 
@@ -32,15 +32,21 @@ class UserTest {
         assertEquals("Hell0123!", user.getPassword());
     }
 
-    @Test
-    public void createUser__InvalidPassword() {
-        User user = new User("john@example.com", "");
+    @ParameterizedTest
+    @ValueSource(strings = {"Hell0123!", "V@lidP455"})
+    public void createUser__ValidPasswords(String password) {
+        User user = new User("john@example.com", password);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
-        assertEquals(3, violations.size());
-        List<String> violationMessages = violations.stream().map(ConstraintViolation::getMessage).toList();
-        assertTrue(violationMessages.contains("Invalid password"));
-        assertTrue(violationMessages.contains("must not be blank"));
-        assertTrue(violationMessages.contains("size must be between 6 and 16"));
+        assertEquals(0, violations.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "hi", "Hell0", "hello!", "HELLO!", "hellOO!", "Hell 0123!"})
+    public void createUser__InvalidPasswords(String password) {
+        User user = new User("john@example.com", password);
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size());
+        assertEquals("Invalid password", violations.iterator().next().getMessage());
     }
 
 }

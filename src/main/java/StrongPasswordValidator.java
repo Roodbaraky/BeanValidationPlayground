@@ -32,6 +32,9 @@ public class StrongPasswordValidator implements ConstraintValidator<StrongPasswo
                 .mapToObj(i -> (char) i)
                 .collect(Collectors.toSet());
         for (Character c : chars) {
+            if (Character.isWhitespace(c)) {
+                return false;
+            }
             if (Character.isUpperCase(c)) {
                 upperFlag = true;
             }
@@ -41,7 +44,7 @@ public class StrongPasswordValidator implements ConstraintValidator<StrongPasswo
             if (Character.isDigit(c)) {
                 digitFlag = true;
             }
-            if (!Character.isLetterOrDigit(c) && !Character.isWhitespace(c)) {
+            if (!Character.isLetterOrDigit(c)) {
                 specialFlag = true;
             }
         }
